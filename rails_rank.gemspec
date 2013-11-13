@@ -22,8 +22,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "yard"
-  spec.add_development_dependency "rails_kvs_driver-redis_driver"
+  spec.add_development_dependency "rails_kvs_driver-redis_driver", "0.2.0"
 
   spec.add_dependency "rails", ">= 3"
-  spec.add_dependency "rails_kvs_driver", "0.1.6"
+  spec.add_dependency "rails_kvs_driver", "0.2.1"
 end

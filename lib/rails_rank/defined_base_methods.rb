@@ -1,7 +1,7 @@
 require 'rails_rank/types/date'
 
 module RailsRank
-  class DefinedBaseMethods
+  module DefinedBaseMethods
 
     # get all time  slot(s).
     #
@@ -10,26 +10,13 @@ module RailsRank
     def all(date_type=RailsRank::Types::Date::HOURLY)
       rails_kvs_driver::session(rails_kvs_driver_config) do |kvs|
         times      = Array.new
-        key_length = (date_type == RailsRank::Types::Date::ALL) ? nil : date_type + 1
 
         kvs.sorted_sets.each do |key|
           key_a = key.split('-')
-          times.push(Time.local(*key_a)) if key_length == nil or key_a.length == key_length
+          times.push(Time.local(*key_a)) if (date_type == RailsRank::Types::Date::ALL) or key_a.length == date_type
         end
 
         times
-      end
-    end
-
-    # count this time slot score of a value.(Time slot is hourly.)
-    # @note when doesn't exist the value, return 0.
-    #
-    # @param value [String]   value to record the score.
-    # @return [Integer] score
-    def count(value)
-      rails_kvs_driver::session(rails_kvs_driver_config) do |kvs|
-        count = kvs.sorted_sets[key_name(Time.now), value]
-        (count.nil?) ? 0 : count
       end
     end
 
@@ -50,6 +37,16 @@ module RailsRank
       end
     end
 
+    # execute the block of code for each ranking.
+    #
+    # @param key     [String]  key of time slot.
+    # @param reverse [Boolean] order desc. [default=asc]
+    # @param limit   [Integer] The maximum size of the request at once.
+    # @param &block [{|value, score, absolute_position| ...}] block of exec code.
+    def each(key, reverse=false, limit=1000, &block)
+      rails_kvs_driver::session(rails_kvs_driver_config) {|kvs| kvs.sorted_sets[key].each(reverse, limit, &block) }
+    end
+
     # increment this time slot score of a value. (Time slot is hourly.)
     # @note when doesn't exist the value, set 'score' to value of score.
     #
@@ -58,7 +55,7 @@ module RailsRank
     # @return [Integer] score after increment
     def increment(value, score=1)
       rails_kvs_driver::session(rails_kvs_driver_config) do |kvs|
-        kvs.sorted_sets.increment(key_name(Time.now), value, score).to_i
+        kvs.sorted_sets[key_name(Time.now)].increment(value, score).to_i
       end
     end
 
@@ -69,6 +66,8 @@ module RailsRank
     # @return [String] key name.
     def key_name(time, date_type=RailsRank::Types::Date::HOURLY)
       case date_type
+        when RailsRank::Types::Date::YEARLY
+          time.strftime('%Y')
         when RailsRank::Types::Date::MONTHLY
           time.strftime('%Y-%m')
         when RailsRank::Types::Date::DAILY
@@ -76,6 +75,52 @@ module RailsRank
         else
           time.strftime('%Y-%m-%d-%H')
       end
+    end
+
+    # get this time slot score of a value.(Time slot is hourly.)
+    # @note when doesn't exist the value, return 0.
+    #
+    # @param value [String]   value to record the score.
+    # @return [Integer] score
+    def score(value)
+      rails_kvs_driver::session(rails_kvs_driver_config) do |kvs|
+        score = kvs.sorted_sets[key_name(Time.now)][value]
+        (score.nil?) ? 0 : score
+      end
+    end
+
+    # table score.
+    # this methods total the calculations done data.
+    #
+    # @param date_type [RailsRank::Types::Date] type of tabulation.
+    # @return [Integer] count tabled data.
+    def table(date_type)
+      raise ArgumentError if date_type < RailsRank::Types::Date::YEARLY
+
+      tabled_data_count = 0
+      base_time = Time.local(*(Time.now.to_a.reverse[4..(3+date_type)]))
+
+      all(date_type).each do |data_time|
+        next unless data_time < base_time
+
+        rails_kvs_driver::session(rails_kvs_driver_config) do |kvs|
+          key       = key_name(data_time, date_type)
+          total_key = key_name(data_time, date_type - 1)
+
+          # table data of the time slot.
+          kvs.sorted_sets[key].each do |member, score, position|
+            if RailsRank::Types::Date::YEARLY < date_type
+              kvs.sorted_sets[total_key].increment(member, score)
+            end
+            after_table(date_type, data_time, member, score.to_i, position)
+          end
+
+          kvs.sorted_sets.delete(key)
+          tabled_data_count += 1
+        end
+      end
+
+      return tabled_data_count
     end
 
   end

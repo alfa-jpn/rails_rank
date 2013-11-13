@@ -14,6 +14,6 @@ describe 'tasks' do
   end
 
   it 'exec total' do
-    @rake["rails_rank:total"].execute
+    @rake["rails_rank:table"].execute
   end
 end

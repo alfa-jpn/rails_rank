@@ -1,4 +1,4 @@
-require 'defined_base_methods'
+require 'rails_rank/defined_base_methods'
 
 module RailsRank
   # @abstract a class of Ranking is override this class.
@@ -41,11 +41,15 @@ module RailsRank
       raise NoMethodError 'Should override rails_kvs_driver_config method.'
     end
 
-    # return ranking config.
+    # callbacked after table.
+    # if use data, override this method.
     #
-    # @abstract
-    def self.rank_config
-      raise NoMethodError 'Should override rank_config method.'
+    # @param date_type [RailsRank::Types::Date] type of tabulation.
+    # @param time      [Time]                   time slot of tabulation.
+    # @param value     [String]                 value of tabulation.
+    # @param score     [Integer]                score of value.
+    # @param position  [Integer]                position of value.
+    def self.after_table(date_type, time, value, score, position)
     end
   end
 end

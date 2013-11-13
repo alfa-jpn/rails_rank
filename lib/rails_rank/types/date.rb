@@ -2,9 +2,10 @@ module RailsRank
   module Types
     module Date
       ALL     = 0
-      MONTHLY = 1
-      DAILY   = 2
-      HOURLY  = 3
+      YEARLY  = 1
+      MONTHLY = 2
+      DAILY   = 3
+      HOURLY  = 4
     end
   end
 end
