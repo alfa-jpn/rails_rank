@@ -92,7 +92,7 @@ module RailsRank
     def score(value, session=nil)
       start_kvs_session(session) do |kvs|
         score = kvs.sorted_sets[key_name(Time.now)][value]
-        (score.nil?) ? 0 : score
+        (score.nil?) ? 0 : score.to_i
       end
     end
 
