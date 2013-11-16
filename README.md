@@ -41,16 +41,18 @@ def self.rails_kvs_driver
 end
 ```
 
-override after_table methods.
+And override after_table methods.
 This method will call after done tabulation.
 Specifically,
-after count hourly.(onece an hour)
-after count daily. (onece a day)
-after count monthly.(once a month)
-after count yearly.(once a year)
+
+- after count hourly.(onece an hour)
+- after count daily. (onece a day)
+- after count monthly.(once a month)
+- after count yearly.(once a year)
 
 when table, after_table will be called repeatedly as the number of the data.
-You should write a code to insert data to database.
+
+You should write a code in here, to insert data to database.
 
 ```ruby
 # callbacked after table.
