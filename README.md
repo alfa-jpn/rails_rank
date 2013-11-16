@@ -42,14 +42,21 @@ end
 ```
 
 override after_table methods.
-This method will call after tabulation.
+This method will call after done tabulation.
+Specifically,
+after count hourly.(onece an hour)
+after count daily. (onece a day)
+after count monthly.(once a month)
+after count yearly.(once a year)
+
+when table, after_table will be called repeatedly as the number of the data.
 You should write a code to insert data to database.
 
 ```ruby
 # callbacked after table.
 # if use data, override this method.
 #
-# @param date_type [RailsRank::Types::Date] type of tabulation.
+# @param date_type [RailsRank::Types::Date] type of tabulation.(HOURLY or DAILY or MONTHLY or YEARLY)
 # @param time      [Time]                   time slot of tabulation.
 # @param value     [String]                 value of tabulation.
 # @param score     [Integer]                score of value.
@@ -60,9 +67,7 @@ end
 
 For example
 
-when there are the next data.
-
-HOURLY DATA
+when there are the next hourly data.
 
 |value|score|
 |:----:|---:|
@@ -71,7 +76,7 @@ HOURLY DATA
 |'id-3'| 8|
 
 
-after_table parameter when it execute counts every one hour.
+after_table will be called 3 times with the next parameter when table the time slot.
 
 |data_type|time|value|score|position|
 |:-------:|:--:|:---:|:---:|:------:|
@@ -90,13 +95,13 @@ config.autoload_paths += Dir["#{config.root}/lib/**/"]
 ```
 
 ### Periodical practice
-This task should execute every an hour. use cron.
+This task must be called every an hour. use cron.
 ```ruby
 bundle exec rake rails_rank:table
 ```
 
 ### How to add and get data.
-hourly data.
+When add a data of the ranking, or get data before table. use next methods.
 ```
 Rankings::AccessRank.increment(@hoge.id)
 Rankings::AccessRank.score(@hoge.id)
