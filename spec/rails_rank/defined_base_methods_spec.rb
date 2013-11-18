@@ -25,7 +25,7 @@ describe RailsRank::DefinedBaseMethods do
     end
 
     @defined_base_methods = IncludeDefinedBaseMethods.new
-    @defined_base_methods.stub({ rails_kvs_driver: @driver, rails_kvs_driver_config: @driver_config, after_table: nil })
+    @defined_base_methods.stub({ rails_kvs_driver: @driver, rails_kvs_driver_config: @driver_config, after_table: nil, after_table_all: nil })
 
     Time.stub({ now: Time.local(2013,11,5) })
 
@@ -179,9 +179,15 @@ describe RailsRank::DefinedBaseMethods do
         }.by(-1)
       end
 
-      it 'callback with date' do
+      it 'after_table callbacked' do
         args = [RailsRank::Types::Date::HOURLY, Time.local(2013,11,5), 'NyarukoSan', 2865, 0]
         @defined_base_methods.should_receive(:after_table).with(*args)
+        @defined_base_methods.table(RailsRank::Types::Date::HOURLY)
+      end
+      
+      it 'after_table_all callbacked' do
+        args = [RailsRank::Types::Date::HOURLY, Time.local(2013, 11, 5, 1)]
+        @defined_base_methods.should_receive(:after_table_all).with(*args)
         @defined_base_methods.table(RailsRank::Types::Date::HOURLY)
       end
 
@@ -225,9 +231,15 @@ describe RailsRank::DefinedBaseMethods do
         }.by(-1)
       end
 
-      it 'callback with date' do
+      it 'after_table callbaked' do
         args = [RailsRank::Types::Date::DAILY, Time.local(2013,11,5), 'NyarukoSan', 2865, 0]
         @defined_base_methods.should_receive(:after_table).with(*args)
+        @defined_base_methods.table(RailsRank::Types::Date::DAILY)
+      end
+      
+      it 'after_table_all callbacked' do
+        args = [RailsRank::Types::Date::DAILY, Time.local(2013, 11, 6)]
+        @defined_base_methods.should_receive(:after_table_all).with(*args)
         @defined_base_methods.table(RailsRank::Types::Date::DAILY)
       end
     end
@@ -255,9 +267,15 @@ describe RailsRank::DefinedBaseMethods do
         }.by(-1)
       end
 
-      it 'callback with date' do
+      it 'after_table callbacked' do
         args = [RailsRank::Types::Date::MONTHLY, Time.local(2013,11), 'NyarukoSan', 2865, 0]
         @defined_base_methods.should_receive(:after_table).with(*args)
+        @defined_base_methods.table(RailsRank::Types::Date::MONTHLY)
+      end
+      
+      it 'after_table_all callbacked' do
+        args = [RailsRank::Types::Date::MONTHLY, Time.local(2013, 12)]
+        @defined_base_methods.should_receive(:after_table_all).with(*args)
         @defined_base_methods.table(RailsRank::Types::Date::MONTHLY)
       end
     end
@@ -278,9 +296,15 @@ describe RailsRank::DefinedBaseMethods do
         }.by(-1)
       end
 
-      it 'callback with date' do
+      it 'after_table callbacked' do
         args = [RailsRank::Types::Date::YEARLY, Time.local(2013), 'NyarukoSan', 2865, 0]
         @defined_base_methods.should_receive(:after_table).with(*args)
+        @defined_base_methods.table(RailsRank::Types::Date::YEARLY)
+      end
+      
+      it 'after_table_all callbacked' do
+        args = [RailsRank::Types::Date::YEARLY, Time.local(2014, 1)]
+        @defined_base_methods.should_receive(:after_table_all).with(*args)
         @defined_base_methods.table(RailsRank::Types::Date::YEARLY)
       end
     end

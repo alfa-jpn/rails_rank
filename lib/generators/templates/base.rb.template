@@ -42,5 +42,12 @@ module Rankings
     # @param position  [Integer]                position of value.
     def self.after_table(date_type, time, value, score, position)
     end
+
+    # callbacked after table all data of the time slot.
+    #
+    # @param date_type [RailsRank::Types::Date] the type of tabulation.
+    # @param base_time [Time]                   the base time of tabulation.
+    def self.after_table_all(date_type, base_time)
+    end
   end
 end

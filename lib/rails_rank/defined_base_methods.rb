@@ -125,7 +125,7 @@ module RailsRank
           tabled_data_count += 1
         end
       end
-
+      after_table_all(date_type, base_time)
       return tabled_data_count
     end
 
